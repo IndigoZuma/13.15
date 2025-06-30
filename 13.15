@@ -1,0 +1,119 @@
+import java.math.BigInteger;
+import java.util.Scanner;
+
+public class Exercise13_15 {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        
+        System.out.print("Enter rational r1 with numerator and denominator separated by a space: ");
+        BigInteger num1 = input.nextBigInteger();
+        BigInteger den1 = input.nextBigInteger();
+        Rational r1 = new Rational(num1, den1);
+        
+        System.out.print("Enter rational r2 with numerator and denominator separated by a space: ");
+        BigInteger num2 = input.nextBigInteger();
+        BigInteger den2 = input.nextBigInteger();
+        Rational r2 = new Rational(num2, den2);
+        
+        System.out.println(r1 + " + " + r2 + " = " + r1.add(r2));
+        System.out.println(r1 + " - " + r2 + " = " + r1.subtract(r2));
+        System.out.println(r1 + " * " + r2 + " = " + r1.multiply(r2));
+        System.out.println(r1 + " / " + r2 + " = " + r1.divide(r2));
+        System.out.println(r2 + " is " + r2.doubleValue());
+        
+        input.close();
+    }
+}
+
+class Rational extends Number implements Comparable<Rational> {
+    private static final long serialVersionUID = 1L;
+    private BigInteger numerator;
+    private BigInteger denominator;
+    
+    public Rational() {
+        this(BigInteger.ZERO, BigInteger.ONE);
+    }
+    
+    public Rational(BigInteger numerator, BigInteger denominator) {
+        BigInteger gcd = numerator.gcd(denominator);
+        this.numerator = (denominator.signum() > 0 ? BigInteger.ONE : BigInteger.valueOf(-1))
+                        .multiply(numerator).divide(gcd);
+        this.denominator = denominator.abs().divide(gcd);
+    }
+    
+    public BigInteger getNumerator() {
+        return numerator;
+    }
+    
+    public BigInteger getDenominator() {
+        return denominator;
+    }
+    
+    public Rational add(Rational second) {
+        BigInteger n = numerator.multiply(second.denominator)
+                      .add(denominator.multiply(second.numerator));
+        BigInteger d = denominator.multiply(second.denominator);
+        return new Rational(n, d);
+    }
+    
+    public Rational subtract(Rational second) {
+        BigInteger n = numerator.multiply(second.denominator)
+                      .subtract(denominator.multiply(second.numerator));
+        BigInteger d = denominator.multiply(second.denominator);
+        return new Rational(n, d);
+    }
+    
+    public Rational multiply(Rational second) {
+        BigInteger n = numerator.multiply(second.numerator);
+        BigInteger d = denominator.multiply(second.denominator);
+        return new Rational(n, d);
+    }
+    
+    public Rational divide(Rational second) {
+        BigInteger n = numerator.multiply(second.denominator);
+        BigInteger d = denominator.multiply(second.numerator);
+        return new Rational(n, d);
+    }
+    
+    @Override
+    public String toString() {
+        if (denominator.equals(BigInteger.ONE)) {
+            return numerator.toString();
+        } else {
+            return numerator + "/" + denominator;
+        }
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Rational other = (Rational) obj;
+        return this.subtract(other).numerator.equals(BigInteger.ZERO);
+    }
+    
+    @Override
+    public int intValue() {
+        return (int) doubleValue();
+    }
+    
+    @Override
+    public long longValue() {
+        return (long) doubleValue();
+    }
+    
+    @Override
+    public float floatValue() {
+        return (float) doubleValue();
+    }
+    
+    @Override
+    public double doubleValue() {
+        return numerator.doubleValue() / denominator.doubleValue();
+    }
+    
+    @Override
+    public int compareTo(Rational o) {
+        return this.subtract(o).numerator.signum();
+    }
+}
